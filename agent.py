@@ -2,8 +2,9 @@
 
 Two modes:
   * Default: a built-in rule-based router (no API key needed).
-  * LLM mode: set OPENAI_API_KEY to let an OpenAI model choose and call the
-    MCP tools for you. Optionally set OPENAI_MODEL (default: gpt-4o-mini).
+  * LLM mode: set OPENAI_API_KEY (in the environment or in a .env file) to let
+    an OpenAI model choose and call the MCP tools for you. Optionally set
+    OPENAI_MODEL (default: gpt-4o-mini).
 
 Run with:  python agent.py
 """
@@ -27,6 +28,23 @@ from mcp import ClientSession, StdioServerParameters, stdio_client  # noqa: E402
 
 SERVER_PATH = Path(__file__).with_name("mcp.py")
 EXIT_WORDS = {"quit", "exit", "q", "bye"}
+
+
+def load_dotenv(path: Path) -> None:
+    """Load KEY=VALUE lines from a .env file into os.environ (no dependency)."""
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8-sig").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key, value = key.strip(), value.strip().strip('"').strip("'")
+        if key:
+            os.environ.setdefault(key, value)
+
+
+load_dotenv(Path(__file__).with_name(".env"))
 
 
 # --------------------------------------------------------------------------
