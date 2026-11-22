@@ -1,3 +1,4 @@
 .env
+flow.log
 __pycache__/
 *.py[cod]
